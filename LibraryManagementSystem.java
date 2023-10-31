@@ -71,7 +71,7 @@ public class LibraryManagementSystem {
         String enteredPassword = new String(System.console().readPassword());
 
         if (username.equals("saikot") && enteredPassword.equals("saikot")) {
-            System.out.println("Login successful.");
+            System.out.println("Login successful.\n");
             mainMenu();
         } else {
             System.out.println("Invalid credentials. Please try again.");
@@ -111,18 +111,22 @@ public class LibraryManagementSystem {
     public static void mainMenu() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.println("Main Menu");
-            System.out.println("1. Add Books");
-            System.out.println("2. Delete Books");
-            System.out.println("3. Search Books");
-            System.out.println("4. Issue Books");
-            System.out.println("5. View Books List");
-            System.out.println("6. Edit Books Records");
-            System.out.println("7. Close Application");
-            System.out.println("Date and Time: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+            System.out.println("\nDate and Time: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss\n\n\n").format(new Date()));
+            System.out.println("\t\t\tWelcome To Our Library\n\n\n");
+            System.out.println("\t\t\tMain Menu\n");
+            System.out.println("\t\t\t1. Add Books");
+            System.out.println("\t\t\t2. Delete Books");
+            System.out.println("\t\t\t3. Search Books");
+            System.out.println("\t\t\t4. Issue Books");
+            System.out.println("\t\t\t5. View Books List");
+            System.out.println("\t\t\t6. Edit Books Records");
+            System.out.println("\t\t\t7. Close Application");
+            
 
-            System.out.print("Enter your choice: ");
+            System.out.print("\nEnter your choice: ");
             String choice = scanner.nextLine();
+            
+            
 
             switch (choice) {
                 case "1":
