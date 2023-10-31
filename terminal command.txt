@@ -1,0 +1,4 @@
+javac LibraryManagementSystem.java
+
+
+java LibraryManagementSystem
