@@ -70,7 +70,7 @@ public class LibraryManagementSystem {
         System.out.print("Enter Password: ");
         String enteredPassword = new String(System.console().readPassword());
 
-        if (username.equals("saikot") && enteredPassword.equals("saikot")) {
+        if (username.equals("1234") && enteredPassword.equals("1234")) {
             System.out.println("Login successful.\n");
             mainMenu();
         } else {
