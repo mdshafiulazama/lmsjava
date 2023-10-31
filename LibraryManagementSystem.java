@@ -57,25 +57,137 @@ class Book {
 public class LibraryManagementSystem {
     private static final String booksFile = "BooksDetails.txt";
     private static final String issuedFile = "IssuedBooks.txt";
+    private static final String usersFile = "Users.txt"; // File to store user information
     private static final String dateFormat = "yyyy-MM-dd";
     private static List<Book> books = new ArrayList<>();
+    private static List<User> users = new ArrayList<>(); // List to store user information
+
+    static class User {
+        private String name;
+        private String contact;
+        private String username;
+        private String password;
+
+        public User(String name, String contact, String username, String password) {
+            this.name = name;
+            this.contact = contact;
+            this.username = username;
+            this.password = password;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getContact() {
+            return contact;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+    }
 
     public static void main(String[] args) {
         loadBooksData();
+        loadUsersData(); // Load user data at the start of the program
 
         Scanner scanner = new Scanner(System.in);
-
-        System.out.print("Enter User ID: ");
+System.out.print("Welcome to our Library\n");
+        System.out.print("\nEnter User ID: ");
         String username = scanner.nextLine();
         System.out.print("Enter Password: ");
         String enteredPassword = new String(System.console().readPassword());
 
-        if (username.equals("1234") && enteredPassword.equals("1234")) {
-            System.out.println("Login successful.\n");
-            mainMenu();
+        if (username.equals("admin") && enteredPassword.equals("admin")) {
+            System.out.println("Admin Login successful.\n");
+            adminMenu();
         } else {
-            System.out.println("Invalid credentials. Please try again.");
+            User currentUser = validateUser(username, enteredPassword);
+            if (currentUser != null) {
+                System.out.println("User Login successful.\n");
+                mainMenu();
+            } else {
+                System.out.println("Invalid credentials. Please try again.");
+            }
         }
+    }
+
+    private static User validateUser(String username, String password) {
+        for (User user : users) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    private static void loadUsersData() {
+        try (Scanner scanner = new Scanner(new File(usersFile))) {
+            while (scanner.hasNextLine()) {
+                String[] userData = scanner.nextLine().split(",");
+                User user = new User(userData[0], userData[1], userData[2], userData[3]);
+                users.add(user);
+            }
+        } catch (FileNotFoundException e) {
+            users = new ArrayList<>();
+        }
+    }
+
+    private static void saveUsersData() {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(usersFile))) {
+            for (User user : users) {
+                writer.println(user.getName() + "," + user.getContact() + "," + user.getUsername() + "," + user.getPassword());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void adminMenu() {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("\nAdmin Menu");
+            System.out.println("1. Add New User");
+            System.out.println("2. Back to Main Menu");
+
+            System.out.print("Enter your choice: ");
+            String adminChoice = scanner.nextLine();
+
+            switch (adminChoice) {
+                case "1":
+                    addNewUser();
+                    break;
+                case "2":
+                    System.out.println("Returning to the main menu.");
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    private static void addNewUser() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Add New User");
+        System.out.print("Enter Name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter Contact: ");
+        String contact = scanner.nextLine();
+        System.out.print("Enter Username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter Password: ");
+        String password = new String(System.console().readPassword());
+
+        User newUser = new User(name, contact, username, password);
+        users.add(newUser);
+
+        System.out.println("New user added successfully.");
+        saveUsersData(); // Save user data after adding a new user
     }
 
     private static void loadBooksData() {
@@ -121,12 +233,9 @@ public class LibraryManagementSystem {
             System.out.println("\t\t\t5. View Books List");
             System.out.println("\t\t\t6. Edit Books Records");
             System.out.println("\t\t\t7. Close Application");
-            
 
             System.out.print("\nEnter your choice: ");
             String choice = scanner.nextLine();
-            
-            
 
             switch (choice) {
                 case "1":
