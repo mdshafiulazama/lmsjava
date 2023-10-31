@@ -8,12 +8,22 @@ class Book {
     private String bookName;
     private String bookId;
     private String rackNumber;
+    private int quantity;
 
-    public Book(String category, String bookName, String bookId, String rackNumber) {
+    public Book(String category, String bookName, String bookId, String rackNumber, int quantity) {
         this.category = category;
         this.bookName = bookName;
         this.bookId = bookId;
         this.rackNumber = rackNumber;
+        this.quantity = quantity;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public String getCategory() {
@@ -50,17 +60,17 @@ class Book {
 
     @Override
     public String toString() {
-        return "Category: " + category + "\nBook Name: " + bookName + "\nBook ID: " + bookId + "\nRack Number: " + rackNumber;
+        return "Category: " + category + "\nBook Name: " + bookName + "\nBook ID: " + bookId + "\nRack Number: " + rackNumber + "\nQuantity: " + quantity;
     }
 }
 
 public class LibraryManagementSystem {
     private static final String booksFile = "BooksDetails.txt";
     private static final String issuedFile = "IssuedBooks.txt";
-    private static final String usersFile = "Users.txt"; // File to store user information
+    private static final String usersFile = "Users.txt";
     private static final String dateFormat = "yyyy-MM-dd";
     private static List<Book> books = new ArrayList<>();
-    private static List<User> users = new ArrayList<>(); // List to store user information
+    private static List<User> users = new ArrayList<>();
 
     static class User {
         private String name;
@@ -94,10 +104,10 @@ public class LibraryManagementSystem {
 
     public static void main(String[] args) {
         loadBooksData();
-        loadUsersData(); // Load user data at the start of the program
+        loadUsersData();
 
         Scanner scanner = new Scanner(System.in);
-System.out.print("Welcome to our Library\n");
+        System.out.print("Welcome to our Library\n");
         System.out.print("\nEnter User ID: ");
         String username = scanner.nextLine();
         System.out.print("Enter Password: ");
@@ -109,8 +119,8 @@ System.out.print("Welcome to our Library\n");
         } else {
             User currentUser = validateUser(username, enteredPassword);
             if (currentUser != null) {
-                System.out.println("User Login successful.\n");
-                mainMenu();
+                System.out.println("User Login successful. Welcome, " + currentUser.getName() + "\n");
+                mainMenu(currentUser);
             } else {
                 System.out.println("Invalid credentials. Please try again.");
             }
@@ -129,14 +139,22 @@ System.out.print("Welcome to our Library\n");
     private static void loadUsersData() {
         try (Scanner scanner = new Scanner(new File(usersFile))) {
             while (scanner.hasNextLine()) {
-                String[] userData = scanner.nextLine().split(",");
-                User user = new User(userData[0], userData[1], userData[2], userData[3]);
-                users.add(user);
+                String line = scanner.nextLine();
+                String[] userData = line.split(",");
+                
+                // Check if the line contains the expected number of values (4 in this case)
+                if (userData.length == 4) {
+                    User user = new User(userData[0], userData[1], userData[2], userData[3]);
+                    users.add(user);
+                } else {
+                    //System.out.println("Skipping invalid user data: " + line);
+                }
             }
         } catch (FileNotFoundException e) {
             users = new ArrayList<>();
         }
     }
+    
 
     private static void saveUsersData() {
         try (PrintWriter writer = new PrintWriter(new FileWriter(usersFile))) {
@@ -187,14 +205,14 @@ System.out.print("Welcome to our Library\n");
         users.add(newUser);
 
         System.out.println("New user added successfully.");
-        saveUsersData(); // Save user data after adding a new user
+        saveUsersData();
     }
 
     private static void loadBooksData() {
         try (Scanner scanner = new Scanner(new File(booksFile))) {
             while (scanner.hasNextLine()) {
                 String[] bookData = scanner.nextLine().split(",");
-                Book book = new Book(bookData[0], bookData[1], bookData[2], bookData[3]);
+                Book book = new Book(bookData[0], bookData[1], bookData[2], bookData[3], Integer.parseInt(bookData[4]));
                 books.add(book);
             }
         } catch (FileNotFoundException e) {
@@ -205,7 +223,7 @@ System.out.print("Welcome to our Library\n");
     private static void saveBooksData() {
         try (PrintWriter writer = new PrintWriter(new FileWriter(booksFile))) {
             for (Book book : books) {
-                writer.println(book.getCategory() + "," + book.getBookName() + "," + book.getBookId() + "," + book.getRackNumber());
+                writer.println(book.getCategory() + "," + book.getBookName() + "," + book.getBookId() + "," + book.getRackNumber() + "," + book.getQuantity());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -220,11 +238,11 @@ System.out.print("Welcome to our Library\n");
         }
     }
 
-    public static void mainMenu() {
+    private static void mainMenu(User currentUser) {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("\nDate and Time: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss\n\n\n").format(new Date()));
-            System.out.println("\t\t\tWelcome To Our Library\n\n\n");
+            System.out.println("\t\t\tWelcome to Our Library, " + currentUser.getName() + "\n\n\n");
             System.out.println("\t\t\tMain Menu\n");
             System.out.println("\t\t\t1. Add Books");
             System.out.println("\t\t\t2. Delete Books");
@@ -248,10 +266,10 @@ System.out.print("Welcome to our Library\n");
                     searchBooks();
                     break;
                 case "4":
-                    issueBooks();
+                    issueBook();
                     break;
                 case "5":
-                    viewBooksList();
+                    viewBookList();
                     break;
                 case "6":
                     editBooksRecords();
@@ -267,10 +285,11 @@ System.out.print("Welcome to our Library\n");
     }
 
     private static void addBooks() {
+        // ... (same as before)
         Scanner scanner = new Scanner(System.in);
         System.out.println("Add Books Menu");
         System.out.println("Select category:");
-        String[] categoryNames = {"Computer", "Electronics", "Electrical", "Civil", "Mechanical"};
+        String[] categoryNames = {"Computer", "Electronics", "English", "Civil", "Mechanical"};
         for (int i = 0; i < categoryNames.length; i++) {
             System.out.println((i + 1) + ". " + categoryNames[i]);
         }
@@ -293,8 +312,10 @@ System.out.print("Welcome to our Library\n");
         String bookId = scanner.nextLine();
         System.out.print("Enter Rack Number: ");
         String rackNumber = scanner.nextLine();
+        System.out.print("Enter Quantity: ");
+        int quantity = Integer.parseInt(scanner.nextLine());
 
-        Book newBook = new Book(selectedCategory, bookName, bookId, rackNumber);
+        Book newBook = new Book(selectedCategory, bookName, bookId, rackNumber, quantity);
         books.add(newBook);
 
         System.out.println("Book added successfully.");
@@ -302,6 +323,7 @@ System.out.print("Welcome to our Library\n");
     }
 
     private static void deleteBooks() {
+        // ... (same as before)
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter Book ID to delete: ");
         String bookId = scanner.nextLine();
@@ -320,6 +342,7 @@ System.out.print("Welcome to our Library\n");
     }
 
     private static void searchBooks() {
+        // ... (same as before)
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter Book ID or Book Name to search: ");
         String searchTerm = scanner.nextLine().toLowerCase();
@@ -338,7 +361,8 @@ System.out.print("Welcome to our Library\n");
         }
     }
 
-    private static void issueBooks() {
+    private static void issueBook() {
+        // ... (same as before)
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter Student ID: ");
         String studentId = scanner.nextLine();
@@ -347,19 +371,36 @@ System.out.print("Welcome to our Library\n");
         System.out.print("Enter Date to Return (yyyy-MM-dd): ");
         String returnDate = scanner.nextLine();
 
-        saveIssuedBookData(studentId, bookId, returnDate);
-        System.out.println("Book issued successfully.");
-    }
+        Book bookToIssue = null;
 
-    private static void viewBooksList() {
-        System.out.println("Book Name             Book ID                Rack No.");
-        System.out.println("---------------------------------------------------------");
         for (Book book : books) {
-            System.out.println(String.format("%-20s %-24s %-8s", book.getBookName(), book.getBookId(), book.getRackNumber()));
+            if (book.getBookId().equals(bookId)) {
+                bookToIssue = book;
+                break;
+            }
+        }
+
+        if (bookToIssue != null && bookToIssue.getQuantity() > 0) {
+            saveIssuedBookData(studentId, bookId, returnDate);
+            bookToIssue.setQuantity(bookToIssue.getQuantity() - 1);
+            System.out.println("Book issued successfully.");
+            saveBooksData();
+        } else {
+            System.out.println("Book with ID '" + bookId + "' is not available for issuing.");
         }
     }
 
+    private static void viewBookList() {
+        System.out.println("Category          Book Name             Book ID              Rack No.              Quantity");
+        System.out.println("-------------------------------------------------------------------------------------------");
+        for (Book book : books) {
+            System.out.println(String.format("%-18s %-20s %-24s %-12s %-18s", book.getCategory(), book.getBookName(), book.getBookId(), book.getRackNumber(), book.getQuantity()));
+        }
+    }
+    
+
     private static void editBooksRecords() {
+        // ... (same as before)
         Scanner scanner = new Scanner(System.in);
         System.out.println("Edit Books Records Menu");
         System.out.print("Enter Book ID to edit: ");
@@ -380,7 +421,8 @@ System.out.print("Welcome to our Library\n");
             System.out.println("2. Edit Book Name");
             System.out.println("3. Edit Book ID");
             System.out.println("4. Edit Rack Number");
-            System.out.println("5. Back to main menu");
+            System.out.println("5. Edit Quantity");
+            System.out.println("6. Back to main menu");
 
             System.out.print("Enter your choice: ");
             String editChoice = scanner.nextLine();
@@ -397,25 +439,26 @@ System.out.print("Welcome to our Library\n");
                     selectedBook.setBookName(newBookName);
                     break;
                 case "3":
-                    System.out.print("Enter new book ID: ");
-                    String newBookId = scanner.nextLine();
-                    selectedBook.setBookId(newBookId);
-                    break;
-                case "4":
-                    System.out.print("Enter new rack number: ");
-                    String newRackNumber = scanner.nextLine();
-                    selectedBook.setRackNumber(newRackNumber);
-                    break;
-                case "5":
-                    return;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
-            }
-
-            System.out.println("Book details updated successfully.");
-            saveBooksData();
-        } else {
-            System.out.println("Book with ID '" + bookId + "' not found in the database.");
+                System.out.print("Enter new book ID: ");
+                String newBookId = scanner.nextLine();
+                selectedBook.setBookId(newBookId);
+                break;
+            case "4":
+                System.out.print("Enter new rack number: ");
+                String newRackNumber = scanner.nextLine();
+                selectedBook.setRackNumber(newRackNumber);
+                break;
+            case "5":
+                return;
+            default:
+                System.out.println("Invalid choice. Please try again.");
         }
+
+        System.out.println("Book details updated successfully.");
+        saveBooksData();
+    } else {
+        System.out.println("Book with ID '" + bookId + "' not found in the database.");
     }
 }
+}
+
