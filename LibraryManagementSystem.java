@@ -170,21 +170,50 @@ public class LibraryManagementSystem {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("\nAdmin Menu");
-            System.out.println("1. Add New User");
-            System.out.println("2. Back to Main Menu");
+            System.out.println("\t\t\t1. Add Books");
+            System.out.println("\t\t\t2. Delete Books");
+            System.out.println("\t\t\t3. Search Books");
+            System.out.println("\t\t\t4. Issue Books");
+            System.out.println("\t\t\t5. View Books List");
+            System.out.println("\t\t\t6. Edit Books Records");
+            System.out.println("7. Add New User");
+              
+            System.out.println("8. Back to Main Menu");
 
             System.out.print("Enter your choice: ");
             String adminChoice = scanner.nextLine();
 
             switch (adminChoice) {
+                
                 case "1":
-                    addNewUser();
+                    addBooks();
                     break;
                 case "2":
-                    System.out.println("Returning to the main menu.");
-                    return;
+                    deleteBooks();
+                    break;
+                case "3":
+                    searchBooks();
+                    break;
+                case "4":
+                    issueBook();
+                    break;
+                case "5":
+                    viewBookList();
+                    break;
+                case "6":
+                    editBooksRecords();
+                    break;
+                    case "7":
+                    addNewUser();
+                    break;
+                case "8":
+                    System.out.println("Closing the application...");
+                    saveBooksData();
+                    System.exit(0);
                 default:
                     System.out.println("Invalid choice. Please try again.");
+                
+                
             }
         }
     }
@@ -244,37 +273,29 @@ public class LibraryManagementSystem {
             System.out.println("\nDate and Time: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss\n\n\n").format(new Date()));
             System.out.println("\t\t\tWelcome to Our Library, " + currentUser.getName() + "\n\n\n");
             System.out.println("\t\t\tMain Menu\n");
-            System.out.println("\t\t\t1. Add Books");
-            System.out.println("\t\t\t2. Delete Books");
-            System.out.println("\t\t\t3. Search Books");
-            System.out.println("\t\t\t4. Issue Books");
-            System.out.println("\t\t\t5. View Books List");
-            System.out.println("\t\t\t6. Edit Books Records");
-            System.out.println("\t\t\t7. Close Application");
+            
+            System.out.println("\t\t\t1. Search Books");
+            System.out.println("\t\t\t2. Issue Books");
+            System.out.println("\t\t\t3. View Books List");
+          
+            System.out.println("\t\t\t4. Close Application");
 
             System.out.print("\nEnter your choice: ");
             String choice = scanner.nextLine();
 
             switch (choice) {
+                
                 case "1":
-                    addBooks();
-                    break;
-                case "2":
-                    deleteBooks();
-                    break;
-                case "3":
                     searchBooks();
                     break;
-                case "4":
+                case "2":
                     issueBook();
                     break;
-                case "5":
+                case "3":
                     viewBookList();
                     break;
-                case "6":
-                    editBooksRecords();
-                    break;
-                case "7":
+                
+                case "4":
                     System.out.println("Closing the application...");
                     saveBooksData();
                     System.exit(0);
