@@ -107,22 +107,25 @@ public class LibraryManagementSystem {
         loadUsersData();
 
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Welcome to our Library\n");
-        System.out.print("\nEnter User ID: ");
+        System.out.println("\n\t\t\t\t--------------------------------------");
+        System.out.print("\t\t\t\t+ \tWelcome to our Library\t     +\n");
+        System.out.println("\t\t\t\t--------------------------------------");
+        System.out.print("\n\t\t\t\t\tLogin (Admin or User)\n");
+        System.out.print("\n\t\t\t\t\t   Username: ");
         String username = scanner.nextLine();
-        System.out.print("Enter Password: ");
+        System.out.print("\n\t\t\t\t\t   Password: ");
         String enteredPassword = new String(System.console().readPassword());
 
         if (username.equals("admin") && enteredPassword.equals("admin")) {
-            System.out.println("Admin Login successful.\n");
+            System.out.println("\n\t\t\t\t\tAdmin Login successful.\n");
             adminMenu();
         } else {
             User currentUser = validateUser(username, enteredPassword);
             if (currentUser != null) {
-                System.out.println("User Login successful. Welcome, " + currentUser.getName() + "\n");
+                System.out.println("\n\t\t\t\tUser Login successful. Welcome, " + currentUser.getName() + "\n");
                 mainMenu(currentUser);
             } else {
-                System.out.println("Invalid credentials. Please try again.");
+                System.out.println("Invalid credentials!!!  Please try again!!!");
             }
         }
     }
@@ -169,16 +172,17 @@ public class LibraryManagementSystem {
     private static void adminMenu() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.println("\nAdmin Menu");
-            System.out.println("\t\t\t1. Add Books");
-            System.out.println("\t\t\t2. Delete Books");
-            System.out.println("\t\t\t3. Search Books");
-            System.out.println("\t\t\t4. Issue Books");
-            System.out.println("\t\t\t5. View Books List");
-            System.out.println("\t\t\t6. Edit Books Records");
-            System.out.println("7. Add New User");
-              
-            System.out.println("8. Back to Main Menu");
+        System.out.println("\n--------------------------------------");
+        System.out.print("+\t      Admin Menu\t     +\n");
+        System.out.println("--------------------------------------\n");
+            System.out.println("1. Add Books\n");
+            System.out.println("2. Delete Books\n");
+            System.out.println("3. Search Books\n");
+            System.out.println("4. Issue Books\n");
+            System.out.println("5. View Books List\n");
+            System.out.println("6. Edit Books Records\n");
+            System.out.println("7. Add New User\n");
+            System.out.println("8. Back to Main Menu\n");
 
             System.out.print("Enter your choice: ");
             String adminChoice = scanner.nextLine();
@@ -271,14 +275,18 @@ public class LibraryManagementSystem {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("\nDate and Time: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss\n\n\n").format(new Date()));
-            System.out.println("\t\t\tWelcome to Our Library, " + currentUser.getName() + "\n\n\n");
-            System.out.println("\t\t\tMain Menu\n");
+            System.out.println("\n----------------------------------------------------------");
+            System.out.println("         Welcome to Our Library, " + currentUser.getName() + "       ");
+            System.out.println("----------------------------------------------------------\n\n\n");
             
-            System.out.println("\t\t\t1. Search Books");
-            System.out.println("\t\t\t2. Issue Books");
-            System.out.println("\t\t\t3. View Books List");
-          
-            System.out.println("\t\t\t4. Close Application");
+            System.out.println("\n--------------------------------------");
+            System.out.print("+\t      User Menu\t             +\n");
+            System.out.println("--------------------------------------\n");
+            
+            System.out.println("1. Search Books");
+            System.out.println("2. Issue Books");
+            System.out.println("3. View Books List");          
+            System.out.println("4. Close Application");
 
             System.out.print("\nEnter your choice: ");
             String choice = scanner.nextLine();
@@ -308,18 +316,21 @@ public class LibraryManagementSystem {
     private static void addBooks() {
         // ... (same as before)
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Add Books Menu");
-        System.out.println("Select category:");
+        System.out.println("\n--------------------------------------");
+        System.out.print("+\t    Add Books Menu\t     +\n");
+        System.out.println("--------------------------------------\n");
+        
+        System.out.println("\t\t\t\t\tSelect category:");
         String[] categoryNames = {"Computer", "Electronics", "English", "Civil", "Mechanical"};
         for (int i = 0; i < categoryNames.length; i++) {
             System.out.println((i + 1) + ". " + categoryNames[i]);
         }
-        System.out.println((categoryNames.length + 1) + ". Back to main menu");
+        System.out.println((categoryNames.length + 1) + ".\t\t\t\t\t Back to main menu");
         System.out.print("Enter your choice: ");
         String categoryChoice = scanner.nextLine();
         int categoryIndex = Integer.parseInt(categoryChoice);
         if (categoryIndex < 1 || categoryIndex > categoryNames.length + 1) {
-            System.out.println("Invalid choice. Please try again.");
+            System.out.println("Invalid choice !!! Please try again!!!");
             return;
         }
         if (categoryIndex == categoryNames.length + 1) {
@@ -373,9 +384,12 @@ public class LibraryManagementSystem {
                 .collect(Collectors.toList());
 
         if (!foundBooks.isEmpty()) {
-            System.out.println("Search Results:");
+
+        System.out.println("-------------------------------------------------------------------------------------------");
+        System.out.println("Category          Book Name             Book ID              Rack No.              Quantity");
+        System.out.println("-------------------------------------------------------------------------------------------");
             for (Book book : foundBooks) {
-                System.out.println(book);
+                 System.out.println(String.format("%-18s %-20s %-24s %-12s %-18s", book.getCategory(), book.getBookName(), book.getBookId(), book.getRackNumber(), book.getQuantity()));
             }
         } else {
             System.out.println("No books found with the given search term.");
@@ -412,6 +426,7 @@ public class LibraryManagementSystem {
     }
 
     private static void viewBookList() {
+        System.out.println("-------------------------------------------------------------------------------------------");
         System.out.println("Category          Book Name             Book ID              Rack No.              Quantity");
         System.out.println("-------------------------------------------------------------------------------------------");
         for (Book book : books) {
@@ -423,7 +438,10 @@ public class LibraryManagementSystem {
     private static void editBooksRecords() {
         // ... (same as before)
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Edit Books Records Menu");
+        System.out.println("\n--------------------------------------");
+            System.out.print("+\tEdit Books Records Menu\t      +\n");
+            System.out.println("--------------------------------------\n");
+        //System.out.println("Edit Books Records Menu");
         System.out.print("Enter Book ID to edit: ");
         String bookId = scanner.nextLine();
 
@@ -433,11 +451,14 @@ public class LibraryManagementSystem {
 
         if (bookToEdit.isPresent()) {
             Book selectedBook = bookToEdit.get();
-            System.out.println("Selected Book Details:");
+            System.out.println("Selected Book Details.");
             System.out.println(selectedBook);
 
             // Provide options to edit book attributes
-            System.out.println("Choose what to edit:");
+            System.out.println("\n--------------------------------------");
+            System.out.print("+\t  Choose what to edit\t     +\n");
+            System.out.println("--------------------------------------\n");
+            //System.out.println("Choose what to edit:");
             System.out.println("1. Edit Category");
             System.out.println("2. Edit Book Name");
             System.out.println("3. Edit Book ID");
