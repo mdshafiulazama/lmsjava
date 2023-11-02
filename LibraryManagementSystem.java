@@ -387,10 +387,9 @@ public class LibraryManagementSystem {
     
         switch (choice) {
             case 1:
-                displayCategoryMenu(); // Show category menu
-                int categoryChoice = scanner.nextInt();
-                scanner.nextLine(); // Consume the newline character
-                searchBooksByCategory(categoryChoice);
+                System.out.print("Enter Category to search: ");
+                String categorySearchTerm = scanner.nextLine().toLowerCase();
+                searchBooksByCategory(categorySearchTerm);
                 break;
             case 2:
                 System.out.print("Enter Book ID to search: ");
@@ -402,20 +401,7 @@ public class LibraryManagementSystem {
         }
     }
     
-    private static void displayCategoryMenu() {
-        System.out.println("Select category:");
-        for (int i = 0; i < categories.size(); i++) {
-            System.out.println((i + 1) + ". " + categories.get(i));
-        }
-        System.out.print("Enter the category number to search: ");
-    }
-    
-    private static void searchBooksByCategory(int categoryChoice) {
-        if (categoryChoice < 1 || categoryChoice > categories.size()) {
-            System.out.println("Invalid category number. Please select a valid category number.");
-            return;
-        }
-        String categorySearchTerm = categories.get(categoryChoice - 1).toLowerCase();
+    private static void searchBooksByCategory(String categorySearchTerm) {
         List<Book> foundBooks = books.stream()
                 .filter(book -> book.getCategory().toLowerCase().contains(categorySearchTerm))
                 .collect(Collectors.toList());
@@ -423,6 +409,13 @@ public class LibraryManagementSystem {
         displayBooks(foundBooks);
     }
     
+    private static void searchBooksByBookId(String bookIdSearchTerm) {
+        List<Book> foundBooks = books.stream()
+                .filter(book -> book.getBookId().toLowerCase().contains(bookIdSearchTerm))
+                .collect(Collectors.toList());
+    
+        displayBooks(foundBooks);
+    }
     
     private static void displayBooks(List<Book> foundBooks) {
         if (!foundBooks.isEmpty()) {
@@ -430,12 +423,15 @@ public class LibraryManagementSystem {
             System.out.println("Category          Book Name             Book ID              Rack No.              Quantity");
             System.out.println("-------------------------------------------------------------------------------------------");
             for (Book book : foundBooks) {
-                System.out.println(String.format("%-18s %-20s %-24s %-12s %-18s", book.getCategory(), book.getBookName(), book.getBookId(), book.getRackNumber(), book.getQuantity()));
-            }
+            System.out.println(String.format("%-18s %-20s %-24s %-12s %10d",
+            book.getCategory(), book.getBookName(), book.getBookId(), book.getRackNumber(), book.getQuantity()));
+}
+
         } else {
             System.out.println("No books found with the given search term.");
         }
     }
+    
     
 
     private static void issueBook() {
@@ -478,9 +474,12 @@ public class LibraryManagementSystem {
         System.out.println("Category          Book Name             Book ID              Rack No.              Quantity");
         System.out.println("-------------------------------------------------------------------------------------------");
         for (Book book : books) {
-            System.out.println(String.format("%-18s %-20s %-24s %-12s %-18s", book.getCategory(), book.getBookName(), book.getBookId(), book.getRackNumber(), book.getQuantity()));
-        }
+        System.out.println(String.format("%-18s %-20s %-24s %-12s %10d",
+            book.getCategory(), book.getBookName(), book.getBookId(), book.getRackNumber(), book.getQuantity()));
+}
+
     }
+    //for (Book book : books)
     private static void editIssuedMenu() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
