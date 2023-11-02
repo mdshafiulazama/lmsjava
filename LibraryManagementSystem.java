@@ -172,23 +172,23 @@ public class LibraryManagementSystem {
     private static void adminMenu() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-        System.out.println("\n--------------------------------------");
-        System.out.print("+\t      Admin Menu\t     +\n");
-        System.out.println("--------------------------------------\n");
-            System.out.println("1. Add Books\n");
-            System.out.println("2. Delete Books\n");
-            System.out.println("3. Search Books\n");
-            System.out.println("4. Issue Books\n");
-            System.out.println("5. View Books List\n");
-            System.out.println("6. Edit Books Records\n");
-            System.out.println("7. Add New User\n");
-            System.out.println("8. Back to Main Menu\n");
-
+            System.out.println("\n--------------------------------------");
+            System.out.print("+\t      Admin Menu\t     +\n");
+            System.out.println("--------------------------------------\n");
+            System.out.println("1. Add Books");
+            System.out.println("2. Delete Books");
+            System.out.println("3. Search Books");
+            System.out.println("4. Issue Books");
+            System.out.println("5. View Books List");
+            System.out.println("6. Edit Books Records");
+            System.out.println("7. Add New User");
+            System.out.println("8. Edit Issued");
+            System.out.println("9. Back to Main Menu");
+    
             System.out.print("Enter your choice: ");
             String adminChoice = scanner.nextLine();
-
+    
             switch (adminChoice) {
-                
                 case "1":
                     addBooks();
                     break;
@@ -207,21 +207,22 @@ public class LibraryManagementSystem {
                 case "6":
                     editBooksRecords();
                     break;
-                    case "7":
+                case "7":
                     addNewUser();
                     break;
                 case "8":
+                    editIssuedMenu();
+                    break;
+                case "9":
                     System.out.println("Closing the application...");
                     saveBooksData();
                     System.exit(0);
                 default:
                     System.out.println("Invalid choice. Please try again.");
-                
-                
             }
         }
     }
-
+    
     private static void addNewUser() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Add New User");
@@ -263,13 +264,14 @@ public class LibraryManagementSystem {
         }
     }
 
-    private static void saveIssuedBookData(String studentId, String bookId, String returnDate) {
+    private static void saveIssuedBookData(String studentId, String bookId, String issueDate, String returnDate) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(issuedFile, true))) {
-            writer.println(studentId + "," + bookId + "," + returnDate);
+            writer.println(studentId + "," + bookId + "," + issueDate + "," + returnDate);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+    
 
     private static void mainMenu(User currentUser) {
         Scanner scanner = new Scanner(System.in);
@@ -374,49 +376,95 @@ public class LibraryManagementSystem {
     }
 
     private static void searchBooks() {
-        // ... (same as before)
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter Book ID or Book Name to search: ");
-        String searchTerm = scanner.nextLine().toLowerCase();
-
+    
+        System.out.println("Search Books:");
+        System.out.println("1. Search by Category");
+        System.out.println("2. Search by Book ID");
+        System.out.print("Enter your choice: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Consume the newline character
+    
+        switch (choice) {
+            case 1:
+                displayCategoryMenu(); // Show category menu
+                int categoryChoice = scanner.nextInt();
+                scanner.nextLine(); // Consume the newline character
+                searchBooksByCategory(categoryChoice);
+                break;
+            case 2:
+                System.out.print("Enter Book ID to search: ");
+                String bookIdSearchTerm = scanner.nextLine().toLowerCase();
+                searchBooksByBookId(bookIdSearchTerm);
+                break;
+            default:
+                System.out.println("Invalid choice. Please select 1 or 2.");
+        }
+    }
+    
+    private static void displayCategoryMenu() {
+        System.out.println("Select category:");
+        for (int i = 0; i < categories.size(); i++) {
+            System.out.println((i + 1) + ". " + categories.get(i));
+        }
+        System.out.print("Enter the category number to search: ");
+    }
+    
+    private static void searchBooksByCategory(int categoryChoice) {
+        if (categoryChoice < 1 || categoryChoice > categories.size()) {
+            System.out.println("Invalid category number. Please select a valid category number.");
+            return;
+        }
+        String categorySearchTerm = categories.get(categoryChoice - 1).toLowerCase();
         List<Book> foundBooks = books.stream()
-                .filter(book -> book.getBookId().toLowerCase().contains(searchTerm) || book.getBookName().toLowerCase().contains(searchTerm))
+                .filter(book -> book.getCategory().toLowerCase().contains(categorySearchTerm))
                 .collect(Collectors.toList());
-
+    
+        displayBooks(foundBooks);
+    }
+    
+    
+    private static void displayBooks(List<Book> foundBooks) {
         if (!foundBooks.isEmpty()) {
-
-        System.out.println("-------------------------------------------------------------------------------------------");
-        System.out.println("Category          Book Name             Book ID              Rack No.              Quantity");
-        System.out.println("-------------------------------------------------------------------------------------------");
+            System.out.println("-------------------------------------------------------------------------------------------");
+            System.out.println("Category          Book Name             Book ID              Rack No.              Quantity");
+            System.out.println("-------------------------------------------------------------------------------------------");
             for (Book book : foundBooks) {
-                 System.out.println(String.format("%-18s %-20s %-24s %-12s %-18s", book.getCategory(), book.getBookName(), book.getBookId(), book.getRackNumber(), book.getQuantity()));
+                System.out.println(String.format("%-18s %-20s %-24s %-12s %-18s", book.getCategory(), book.getBookName(), book.getBookId(), book.getRackNumber(), book.getQuantity()));
             }
         } else {
             System.out.println("No books found with the given search term.");
         }
     }
+    
 
     private static void issueBook() {
-        // ... (same as before)
+        // ... (existing code)
+    
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter Student ID: ");
         String studentId = scanner.nextLine();
         System.out.print("Enter Book ID to issue: ");
         String bookId = scanner.nextLine();
-        System.out.print("Enter Date to Return (yyyy-MM-dd): ");
+    
+        // Get the current date as the issue date
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String issueDate = dateFormat.format(new Date());
+    
+        System.out.print("Enter Return Date (yyyy-MM-dd): ");
         String returnDate = scanner.nextLine();
-
+    
         Book bookToIssue = null;
-
+    
         for (Book book : books) {
             if (book.getBookId().equals(bookId)) {
                 bookToIssue = book;
                 break;
             }
         }
-
+    
         if (bookToIssue != null && bookToIssue.getQuantity() > 0) {
-            saveIssuedBookData(studentId, bookId, returnDate);
+            saveIssuedBookData(studentId, bookId, issueDate, returnDate);
             bookToIssue.setQuantity(bookToIssue.getQuantity() - 1);
             System.out.println("Book issued successfully.");
             saveBooksData();
@@ -424,7 +472,7 @@ public class LibraryManagementSystem {
             System.out.println("Book with ID '" + bookId + "' is not available for issuing.");
         }
     }
-
+    
     private static void viewBookList() {
         System.out.println("-------------------------------------------------------------------------------------------");
         System.out.println("Category          Book Name             Book ID              Rack No.              Quantity");
@@ -432,6 +480,92 @@ public class LibraryManagementSystem {
         for (Book book : books) {
             System.out.println(String.format("%-18s %-20s %-24s %-12s %-18s", book.getCategory(), book.getBookName(), book.getBookId(), book.getRackNumber(), book.getQuantity()));
         }
+    }
+    private static void editIssuedMenu() {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("\n--------------------------------------");
+            System.out.print("+\t   Edit Issued Menu\t     +\n");
+            System.out.println("--------------------------------------\n");
+            System.out.println("1. Show All Issued Books");
+            System.out.println("2. Delete Issued Book");
+            System.out.println("3. Back to Admin Menu");
+    
+            System.out.print("Enter your choice: ");
+            String editIssuedChoice = scanner.nextLine();
+    
+            switch (editIssuedChoice) {
+                case "1":
+                    showAllIssuedBooks();
+                    break;
+                case "2":
+                    deleteIssuedBook();
+                    break;
+                case "3":
+                    return; // Back to the Admin Menu
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+    private static void showAllIssuedBooks() {
+        try (Scanner scanner = new Scanner(new File(issuedFile))) {
+            System.out.println("Issued Books:");
+            System.out.println("Student ID\tBook ID\tIssued Date\tReturn Date");
+    
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] issuedData = line.split(",");
+                if (issuedData.length == 4) { // Expecting 4 elements: Student ID, Book ID, Issued Date, Return Date
+                    System.out.println(issuedData[0] + "\t" + issuedData[1] + "\t" + issuedData[2] + "\t" + issuedData[3]);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("No issued books found.");
+        }
+    }
+    
+    
+    private static void deleteIssuedBook() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter Student ID of the issued book to delete: ");
+        String studentId = scanner.nextLine();
+    
+        System.out.print("Enter Book ID of the issued book to delete: ");
+        String bookId = scanner.nextLine();
+    
+        List<String> updatedIssuedBooks = new ArrayList<>();
+    
+        try (Scanner fileScanner = new Scanner(new File(issuedFile))) {
+            while (fileScanner.hasNextLine()) {
+                String line = fileScanner.nextLine();
+                String[] issuedData = line.split(",");
+                if (issuedData.length == 3 && !issuedData[0].equals(studentId) && !issuedData[1].equals(bookId)) {
+                    updatedIssuedBooks.add(line);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("No issued books found.");
+            return;
+        }
+    
+        try (PrintWriter writer = new PrintWriter(new FileWriter(issuedFile))) {
+            for (String line : updatedIssuedBooks) {
+                writer.println(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    
+        for (Book book : books) {
+            if (book.getBookId().equals(bookId)) {
+                book.setQuantity(book.getQuantity() + 1);
+                break;
+            }
+        }
+    
+        System.out.println("Issued book with Student ID '" + studentId + "' and Book ID '" + bookId + "' has been deleted.");
+        saveBooksData();
     }
     
 
@@ -503,4 +637,3 @@ public class LibraryManagementSystem {
     }
 }
 }
-
