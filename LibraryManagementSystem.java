@@ -57,6 +57,8 @@ class Book {
     public void setRackNumber(String rackNumber) {
         this.rackNumber = rackNumber;
     }
+    
+
 
     @Override
     public String toString() {
@@ -83,6 +85,7 @@ public class LibraryManagementSystem {
             this.contact = contact;
             this.username = username;
             this.password = password;
+            
         }
 
         public String getName() {
@@ -99,6 +102,17 @@ public class LibraryManagementSystem {
 
         public String getPassword() {
             return password;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+    
+        public void setContact(String contact) {
+            this.contact = contact;
+        }
+    
+        public void setPassword(String password) {
+            this.password = password;
         }
     }
 
@@ -181,7 +195,7 @@ public class LibraryManagementSystem {
             System.out.println("4. Issue Books");
             System.out.println("5. View Books List");
             System.out.println("6. Edit Books Records");
-            System.out.println("7. Add New User");
+            System.out.println("7. User");
             System.out.println("8. Edit Issued");
             System.out.println("9. Back to Main Menu");
     
@@ -207,21 +221,102 @@ public class LibraryManagementSystem {
                 case "6":
                     editBooksRecords();
                     break;
-                case "7":
-                    addNewUser();
+                    case "7":
+                    userMenu();
                     break;
                 case "8":
                     editIssuedMenu();
                     break;
                 case "9":
-                    System.out.println("Closing the application...");
-                    saveBooksData();
-                    System.exit(0);
+                    //System.out.println("Logging out and returning to the login section...");
+                    return; 
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
         }
     }
+    private static void userMenu() {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("\n--------------------------------------");
+            System.out.print("+\t   User Menu\t     +\n");
+            System.out.println("--------------------------------------\n");
+            System.out.println("1. All User Details");
+            System.out.println("2. Edit User");
+            System.out.println("3. Create User");
+            System.out.println("4. Back to Admin Menu");
+    
+            System.out.print("Enter your choice: ");
+            String userChoice = scanner.nextLine();
+    
+            switch (userChoice) {
+                case "1":
+                    viewAllUserDetails();
+                    break;
+                    //case "2":
+                    //editUser(); // Correct way to call the method
+                    //break;
+                
+                case "3":
+                    createUser();
+                    break;
+                case "4":
+                    return; // Back to the Admin Menu
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+    public static void viewAllUserDetails() {
+        // Implement the functionality to view all user details
+        System.out.println("Viewing all user details...");
+        System.out.println("----------------------------------------------------------------------");
+        System.out.println(String.format(" %-15s  %-25s  %-15s  %-15s  %-10s ", "Name", "Contact", "Username", "Password", ""));
+        System.out.println("----------------------------------------------------------------------");
+    
+        for (User user : users) {
+            System.out.println(String.format(" %-15s  %-25s  %-15s  %-15s  %-10s ",
+                user.getName(), user.getContact(), user.getUsername(), user.getPassword(), ""));
+        }
+    
+        System.out.println("-----------------------------------------------------------");
+    }
+    
+    
+    public static void createUser() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Creating a new user...");
+    
+        System.out.print("Enter Name: ");
+        String name = scanner.nextLine();
+        
+        System.out.print("Enter Contact: ");
+        String contact = scanner.nextLine();
+    
+        System.out.print("Enter Username: ");
+        String username = scanner.nextLine();
+        
+        System.out.print("Enter Password: ");
+        String password = new String(System.console().readPassword());
+    
+        User newUser = new User(name, contact, username, password);
+        users.add(newUser);
+    
+        System.out.println("New user created successfully.");
+        saveUsersData(); // Save the updated user data to your data source
+    }
+    
+    // Helper method to find a user by username
+    private static User findUserByUsername(String username) {
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                return user;
+            }
+        }
+        return null; // User not found
+    }
+    
+    
     
     private static void addNewUser() {
         Scanner scanner = new Scanner(System.in);
@@ -271,7 +366,6 @@ public class LibraryManagementSystem {
             e.printStackTrace();
         }
     }
-    
 
     private static void mainMenu(User currentUser) {
         Scanner scanner = new Scanner(System.in);
@@ -510,13 +604,17 @@ public class LibraryManagementSystem {
     private static void showAllIssuedBooks() {
         try (Scanner scanner = new Scanner(new File(issuedFile))) {
             System.out.println("Issued Books:");
-            System.out.println("Student ID\tBook ID\tIssued Date\tReturn Date");
+            System.out.println("------------------------------------------------------------------");
+            System.out.println("Student ID     Book ID         Issued Date             Return Date");
+            System.out.println("------------------------------------------------------------------");
+            
+            // Loop through and display student book transactions
     
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] issuedData = line.split(",");
                 if (issuedData.length == 4) { // Expecting 4 elements: Student ID, Book ID, Issued Date, Return Date
-                    System.out.println(issuedData[0] + "\t" + issuedData[1] + "\t" + issuedData[2] + "\t" + issuedData[3]);
+                    System.out.println("    "+issuedData[0] + " \t" + issuedData[1] + " \t  \t" + issuedData[2] + "\t \t" + issuedData[3]);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -566,8 +664,6 @@ public class LibraryManagementSystem {
         System.out.println("Issued book with Student ID '" + studentId + "' and Book ID '" + bookId + "' has been deleted.");
         saveBooksData();
     }
-    
-
     private static void editBooksRecords() {
         // ... (same as before)
         Scanner scanner = new Scanner(System.in);
@@ -624,7 +720,13 @@ public class LibraryManagementSystem {
                 selectedBook.setRackNumber(newRackNumber);
                 break;
             case "5":
-                return;
+            System.out.print("Enter new quantity: ");
+                int newQuantity = scanner.nextInt();
+                selectedBook.setQuantity(newQuantity);
+                break;
+                case "6":
+                // Add code to go back to the main menu or exit the editing process
+                break;
             default:
                 System.out.println("Invalid choice. Please try again.");
         }
