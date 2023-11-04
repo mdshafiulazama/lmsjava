@@ -475,7 +475,8 @@ public class LibraryManagementSystem {
         System.out.println("--------------------------------------\n");
 
         System.out.println("Select category:");
-        String[] categoryNames = { "Computer", "Electronics", "English", "Civil", "Mechanical" };
+        String[] categoryNames = { "Computer", "Electronics", "English", "Civil", "Mechanical", "Matheatical",
+                "Accounting", "Physics", "Chemistry" };
         for (int i = 0; i < categoryNames.length; i++) {
             System.out.println((i + 1) + ". " + categoryNames[i]);
         }
@@ -541,9 +542,9 @@ public class LibraryManagementSystem {
 
     private static void searchBooks() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("-----------------------------------------------------------\n");
-        System.out.println("\tSearch Books\n");
-        System.out.println("-----------------------------------------------------------\n");
+        System.out.println("----------------------------------------------");
+        System.out.println("\tSearch Books");
+        System.out.println("----------------------------------------------");
         System.out.println("1. Search by Category");
         System.out.println("2. Search by Book ID");
         System.out.print("Enter your choice: ");
@@ -606,39 +607,42 @@ public class LibraryManagementSystem {
     }
 
     private static void issueBook() {
-        // ... (existing code)
-
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter Student ID: ");
         String studentId = scanner.nextLine();
         System.out.print("Enter Book ID to issue: ");
         String bookId = scanner.nextLine();
 
-        // Get the current date as the issue date
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String issueDate = dateFormat.format(new Date());
-
-        System.out.print("Enter Return Date (yyyy-MM-dd): ");
-        String returnDate = scanner.nextLine();
-
+        // Check if the book with the given ID exists (case-insensitive comparison)
         Book bookToIssue = null;
-
         for (Book book : books) {
-            if (book.getBookId().equals(bookId)) {
+            if (book.getBookId().equalsIgnoreCase(bookId)) {
                 bookToIssue = book;
                 break;
             }
         }
 
-        if (bookToIssue != null && bookToIssue.getQuantity() > 0) {
-            saveIssuedBookData(studentId, bookId, issueDate, returnDate);
-            bookToIssue.setQuantity(bookToIssue.getQuantity() - 1);
-            System.out.println("Book issued successfully.");
-            saveBooksData();
-        } else {
-            System.out.println("Book with ID '" + bookId + "' is not available for issuing.");
-        }
+        if (bookToIssue != null) {
+            // Check if the book is available
+            if (bookToIssue.getQuantity() > 0) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                String issueDate = dateFormat.format(new Date());
 
+                System.out.print("Enter Return Date (yyyy-MM-dd): ");
+                String returnDate = scanner.nextLine();
+
+                // Update the book quantity and save issued book data
+                bookToIssue.setQuantity(bookToIssue.getQuantity() - 1);
+                saveBooksData(); // Save updated book data
+
+                saveIssuedBookData(studentId, bookId, issueDate, returnDate);
+                System.out.println("Book issued successfully.");
+            } else {
+                System.out.println("Book with ID '" + bookId + "' is not available for issuing.");
+            }
+        } else {
+            System.out.println("Book with ID '" + bookId + "' not found.");
+        }
     }
 
     private static void viewBookList() {
@@ -712,7 +716,7 @@ public class LibraryManagementSystem {
                 if (issuedData.length == 4) { // Expecting 4 elements: Student ID, Book ID, Issued Date, Return Date
                     System.out.println("    " + issuedData[0] + " \t" + issuedData[1] + " \t  \t" + issuedData[2]
                             + "\t \t" + issuedData[3]);
-                    System.out.println("------------------------------------------------------------------");
+
                 }
             }
             scanner.close(); // Close the Scanner when done reading
@@ -724,21 +728,22 @@ public class LibraryManagementSystem {
 
     private static void deleteIssuedBook() {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter Student ID of to return the book:  ");
+        System.out.print("Enter Student ID of the book to return: ");
         String studentId = scanner.nextLine();
-
+    
         System.out.print("Enter Book ID of the issued book to return: ");
         String bookId = scanner.nextLine();
-
+    
         List<String> updatedIssuedBooks = new ArrayList<>();
-
+    
         try (Scanner fileScanner = new Scanner(new File(issuedFile))) {
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine();
                 String[] issuedData = line.split(",");
-                if (issuedData.length == 3 && !issuedData[0].equals(studentId) && !issuedData[1].equals(bookId)) {
+                if (issuedData.length == 4 && issuedData[0].equals(studentId) && issuedData[1].equals(bookId)) {
+                    // Skip this line, as it matches the student ID and book ID to be deleted
+                } else {
                     updatedIssuedBooks.add(line);
-                    System.out.println("------------------------------------------------------------------");
                 }
             }
         } catch (FileNotFoundException e) {
@@ -746,7 +751,7 @@ public class LibraryManagementSystem {
             System.out.println("------------------------------------------------------------------");
             return;
         }
-
+    
         try (PrintWriter writer = new PrintWriter(new FileWriter(issuedFile))) {
             for (String line : updatedIssuedBooks) {
                 writer.println(line);
@@ -754,21 +759,21 @@ public class LibraryManagementSystem {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+    
         for (Book book : books) {
             if (book.getBookId().equals(bookId)) {
                 book.setQuantity(book.getQuantity() + 1);
                 break;
             }
         }
-
+    
         System.out.println(
-                "Issued book with Student ID '" + studentId + "' and Book ID '" + bookId + "' has been deleted.");
-
+            "Issued book with Student ID '" + studentId + "' and Book ID '" + bookId + "' has been returned.");
+    
         saveBooksData();
         System.out.println("------------------------------------------------------------------");
     }
-
+    
     private static void editBooksRecords() {
         // ... (same as before)
         Scanner scanner = new Scanner(System.in);
